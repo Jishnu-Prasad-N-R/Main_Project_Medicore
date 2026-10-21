@@ -125,5 +125,5 @@ MediCore/
 
 ## Author
 
-**Jishnu Prasad**
+**Jishnu Prasad N R**
 *Built as a comprehensive portfolio project demonstrating full-stack Django capabilities, REST API integration, and secure database design.*
