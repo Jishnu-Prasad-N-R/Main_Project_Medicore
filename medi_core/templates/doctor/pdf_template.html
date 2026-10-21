@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prescription Report</title>
+    <style>
+        @page { size: A4; margin: 1.5cm; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; line-height: 1.5; font-size: 13px; }
+        .header { text-align: center; border-bottom: 2px solid #00a8e8; padding-bottom: 15px; margin-bottom: 25px; }
+        .header h1 { margin: 0; color: #00a8e8; font-size: 32px; letter-spacing: 2px; text-transform: uppercase; }
+        .header p { margin: 0; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+        .details-table { width: 100%; margin-bottom: 25px; }
+        .details-table td { vertical-align: top; width: 50%; }
+        .section-title { font-size: 13px; font-weight: bold; text-transform: uppercase; color: #00a8e8; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 8px; }
+        .text-right { text-align: right; }
+        .text-left { text-align: left; }
+        .bold { font-weight: bold; }
+        .muted { color: #6c757d; font-size: 12px; }
+        p { margin: 0 0 5px 0; }
+        .vitals-box { background-color: #f8f9fa; padding: 15px; border-left: 4px solid #00a8e8; margin-bottom: 25px; border-radius: 4px; }
+        .vitals-table { width: 100%; font-size: 12px; }
+        .rx-section { margin-bottom: 30px; }
+        .rx-list { padding: 15px; border: 1px solid #e0e0e0; border-radius: 5px; background-color: #fcfcfc; min-height: 80px; }
+        .footer { margin-top: 40px; border-top: 1px dashed #ccc; padding-top: 20px; page-break-inside: avoid; }
+        .footer-table { width: 100%; }
+        .qr-code { width: 85px; height: 85px; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>MediCore</h1>
+        <p>Smart Healthcare Management System</p>
+    </div>
+    <table class="details-table">
+        <tr>
+            <td class="text-left" style="padding-right: 20px;">
+                <div class="section-title">Doctor / Clinic Details</div>
+                <p class="bold">Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</p>
+                <p class="muted">{{ doctor.specialization.name|default:"General Medicine" }}</p>
+                <p>Reg No: {{ doctor.registration_number }}</p>
+                <p>Clinic: {{ doctor.address }}</p>
+                <p>Ph: {{ doctor.phone_number }}</p>
+            </td>
+            <td class="text-right" style="padding-left: 20px;">
+                <div class="section-title text-right">Patient Details</div>
+                <p class="bold">{{ patient.user.first_name }} {{ patient.user.last_name }}</p>
+                <p>Age: {{ patient.age }} &nbsp;|&nbsp; Gender: {{ patient.gender }}</p>
+                <p>Ph: {{ patient.phone_number }}</p>
+                <p>Address: {{ patient.address }}</p>
+                <p class="muted" style="margin-top: 5px;">Date: {{ prescription.appointment.date }}</p>
+            </td>
+        </tr>
+    </table>
+    <div class="vitals-box">
+        <div class="section-title" style="border:none; margin-bottom: 5px;">Vitals & Diagnosis</div>
+        <table class="vitals-table">
+            <tr>
+                <td>
+                    <span class="bold muted">BP:</span> 
+                    {% if prescription.blood_pressure %}{{ prescription.blood_pressure }} mmHg{% else %}--{% endif %}
+                </td>
+                <td>
+                    <span class="bold muted">Sugar:</span> 
+                    {% if prescription.sugar_level %}{{ prescription.sugar_level }} mg/dL{% else %}--{% endif %}
+                </td>
+                <td>
+                    <span class="bold muted">Weight:</span> 
+                    {% if prescription.weight %}{{ prescription.weight }} Kg{% else %}--{% endif %}
+                </td>
+                <td>
+                    <span class="bold muted">Cholesterol:</span> 
+                    {% if prescription.cholesterol %}{{ prescription.cholesterol }} mg/dL{% else %}--{% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" style="padding-top:12px;">
+                    <span class="bold muted">Diagnosis:</span> {{ prescription.symptoms }}
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="rx-section">
+        <div class="section-title" style="font-size: 16px;">Rx</div>
+        <div class="rx-list">
+            {% if prescription.medicine_details %}
+                {{ prescription.medicine_details|linebreaks }}
+            {% else %}
+                <p class="muted">No medicines prescribed.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% if prescription.notes %}
+    <div class="rx-section">
+        <div class="section-title">Advice / Diet / Notes</div>
+        <p>{{ prescription.notes|linebreaks }}</p>
+    </div>
+    {% endif %}
+    <div class="footer">
+        <table class="footer-table">
+            <tr>
+                <td class="text-left" style="width: 33%; vertical-align: bottom;">
+                    <p class="bold">Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</p>
+                    <p class="muted" style="font-size:10px;">{{ doctor.specialization.name|default:"--" }}</p>
+                </td>
+                <td style="width: 34%; text-align: center; vertical-align: bottom;">
+                    <img src="data:image/png;base64,{{ qr_code_data }}" class="qr-code" alt="Scan to Verify">
+                    <p class="muted" style="font-size: 9px; letter-spacing: 1px;">PATIENT RECORD ACCESS</p>
+                </td>
+                <td class="text-right" style="width: 33%; vertical-align: bottom;">
+                    <p class="bold" style="color: #00a8e8; margin-bottom: 2px;">Electronically Generated</p>
+                    <p class="muted" style="font-size:10px;">MediCore Secure System</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

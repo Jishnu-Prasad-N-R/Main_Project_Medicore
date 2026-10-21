@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main %}
+<div class="container-fluid bg-primary py-5 mb-5 hero-header">
+    <div class="container py-5">
+        <div class="row justify-content-center py-5">
+            <div class="col-lg-10 pt-lg-5 mt-lg-5 text-center">
+                <h1 class="display-3 text-white animated slideInDown">Book Appointment</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'home' %}#doctors-list">Doctors</a></li>
+                        <li class="breadcrumb-item text-white active" aria-current="page">Book</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="row g-5">
+            
+            <div class="col-lg-4 wow slideInUp" data-wow-delay="0.1s">
+                <div class="card border-0 shadow-sm rounded-4 text-center p-4 h-100 border-top border-primary border-5" style="border-top-color: #00a8e8 !important;">
+                    <div class="mb-4 mt-2">
+                        {% if doctor.profile_pic %}
+                            <img src="{{ doctor.profile_pic.url }}" class="rounded-circle shadow-sm" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #00a8e8;">
+                        {% else %}
+                            <img src="https://via.placeholder.com/150" class="rounded-circle shadow-sm" style="border: 3px solid #00a8e8;">
+                        {% endif %}
+                    </div>
+                    <h3 class="fw-bold text-dark mb-1">Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</h3>
+                    <p class="text-white badge rounded-pill px-3 py-2 mb-2" style="background-color: #00a8e8;">{{ doctor.specialization.name }}</p>
+                    
+                    <p class="text-secondary fw-bold mb-4">{{ doctor.qualifications }}</p>
+                    
+                    <div class="text-start bg-light p-3 rounded-3 mb-3">
+                        <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt me-2" style="color: #00a8e8;"></i> <strong>Clinic Address:</strong> <br> {{ doctor.address }}</p>
+                    </div>
+                    <div class="text-start bg-light p-3 rounded-3 mb-3">
+                        <p class="text-muted small mb-0"><i class="fas fa-clock me-2" style="color: #00a8e8;"></i> <strong>Consultation Hours:</strong> <br> Mon - Sat, 10:00 AM - 6:00 PM</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8 wow slideInUp" data-wow-delay="0.3s">
+                <div class="bg-light rounded-4 p-5 h-100 shadow-sm">
+                    <div class="section-title mb-4">
+                        <h5 class="position-relative d-inline-block text-uppercase fw-bold" style="color: #00a8e8;">Schedule Visit</h5>
+                        <h2 class="display-6 mb-0 text-dark fw-bold">Select Date & Time</h2>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label fw-bold text-secondary small">Appointment Date</label>
+                                {{ form.date }}
+                                {% if form.date.errors %}
+                                    <small class="text-danger ms-2">{{ form.date.errors.0 }}</small>
+                                {% endif %}
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label fw-bold text-secondary small">Preferred Time (10 AM - 6 PM)</label>
+                                {{ form.time }}
+                                {% if form.time.errors %}
+                                    <small class="text-danger ms-2">{{ form.time.errors.0 }}</small>
+                                {% endif %}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-secondary small">Reason for Visit / Symptoms</label>
+                                {{ form.reason }}
+                                {% if form.reason.errors %}
+                                    <small class="text-danger ms-2">{{ form.reason.errors.0 }}</small>
+                                {% endif %}
+                            </div>
+                            <div class="col-12 mt-4">
+                                <button class="btn text-white w-100 py-3 fs-5 fw-bold rounded-pill shadow-sm hover-btn" type="submit" style="background-color: #00a8e8;">
+                                    <i class="fas fa-calendar-check me-2"></i> Request Appointment
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+{% if form.non_field_errors %}
+<div class="position-fixed bottom-0 end-0 p-4" style="z-index: 9999">
+    <div id="bookingErrorToast" class="toast show align-items-center text-white bg-danger border-0 shadow-lg rounded-3" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex p-2">
+            <div class="toast-body fs-6">
+                <i class="fas fa-exclamation-triangle me-2 fa-lg"></i>
+                <strong>Booking Failed:</strong> {{ form.non_field_errors.0 }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var toastElement = document.getElementById('bookingErrorToast');
+        if (toastElement) {
+            // Uses Bootstrap 5 Toast functionality
+            // It will stay for 6 seconds (6000ms) then fade out smoothly
+            var toast = new bootstrap.Toast(toastElement, { delay: 6000 });
+            toast.show();
+        }
+    });
+</script>
+{% endif %}
+
+<style>
+    /* Premium Button Hover Effect */
+    .hover-btn { transition: all 0.3s ease; }
+    .hover-btn:hover { 
+        background-color: #0088cc !important; 
+        transform: translateY(-2px); 
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; 
+    }
+</style>
+{% endblock %}

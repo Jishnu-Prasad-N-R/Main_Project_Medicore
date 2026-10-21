@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container-fluid py-5">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2 class="fw-bold text-primary"><i class="fas fa-user-shield me-2"></i>Admin Control Panel</h2>
+            <a href="{% url 'manage_departments' %}" class="btn btn-outline-primary"><i class="fas fa-building me-2"></i>Manage Departments</a>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-primary text-white text-center p-4">
+                <h3>{{ total_doctors }}</h3>
+                <p class="mb-0">Total Doctors</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-success text-white text-center p-4">
+                <h3>{{ total_patients }}</h3>
+                <p class="mb-0">Total Patients</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-info text-white text-center p-4">
+                <h3>{{ total_appointments }}</h3>
+                <p class="mb-0">Total Appointments</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded border-start border-warning border-5">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 text-warning fw-bold"><i class="fas fa-user-clock me-2"></i>Pending Doctor Verifications</h5>
+        </div>
+        <div class="card-body p-0">
+            {% if pending_doctors %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Qualifications</th>
+                            <th>Department</th>
+                            <th>Reg. Number</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in pending_doctors %}
+                        <tr>
+                            <td class="fw-bold">Dr. {{ doc.user.first_name }} {{ doc.user.last_name }}</td>
+                            <td>{{ doc.qualifications }}</td>
+                            <td>{{ doc.specialization.name }}</td>
+                            <td>{{ doc.registration_number }}</td>
+                            <td>
+                                <form method="POST" action="{% url 'verify_doctor' doc.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="approve">
+                                    <button type="submit" class="btn btn-success btn-sm me-2"><i class="fas fa-check"></i> Approve</button>
+                                </form>
+                                <form method="POST" action="{% url 'verify_doctor' doc.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="reject">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Reject and deactivate this profile?');"><i class="fas fa-times"></i> Reject</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-4 text-center text-muted">No pending doctor verifications.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

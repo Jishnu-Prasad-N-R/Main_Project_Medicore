@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block main %}
+
+<div class="container py-5" style="background-color: #f8f9fa; min-height: 80vh;">
+    <div class="row">
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm rounded-4 text-center p-4 h-100 border-top border-primary border-5" style="border-top-color: #00a8e8 !important;">
+             
+                <h4 class="fw-bold text-dark mb-1">{{ user.first_name }} {{ user.last_name }}</h4>
+                <p class="text-muted mb-3">Patient ID: #PID-00{{ user.patient_profile.id }}</p>
+                
+                <div class="row text-center mb-4 border-top border-bottom py-3 mx-1 bg-light rounded-3">
+                    <div class="col-4 border-end">
+                        <small class="text-muted d-block fw-bold">Age</small>
+                        <span class="text-dark fw-bold">{{ user.patient_profile.age }}</span>
+                    </div>
+                    <div class="col-4 border-end">
+                        <small class="text-muted d-block fw-bold">Gender</small>
+                        <span class="text-dark fw-bold">{{ user.patient_profile.gender|title }}</span>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted d-block fw-bold">Blood</small>
+                        <span class="text-danger fw-bold">{{ user.patient_profile.blood_group|default:"--" }}</span>
+                    </div>
+                </div>
+                
+                <div class="text-start mb-4 px-2">
+                    <p class="text-muted small mb-2"><i class="fas fa-phone-alt me-2" style="color: #00a8e8;"></i> {{ user.patient_profile.phone_number }}</p>
+                    <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt me-2" style="color: #00a8e8;"></i> {{ user.patient_profile.address }}</p>
+                    {% if user.patient_profile.known_allergies %}
+                        <p class="text-danger small mb-0 fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> Allergies: {{ user.patient_profile.known_allergies }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="mt-auto">
+                    <a href="{% url 'home' %}#find-doctor" class="btn text-white rounded-pill w-100 fw-bold py-2 shadow-sm" style="background-color: #00a8e8;">
+                        <i class="fas fa-search me-2"></i> Book New Appointment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center rounded-top-4">
+                    <h5 class="mb-0 text-dark fw-bold"><i class="fas fa-calendar-alt me-2" style="color: #00a8e8;"></i> My Appointments</h5>
+                </div>
+                
+                <div class="card-body p-0">
+                    {% if appointments %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light text-muted">
+                                    <tr>
+                                        <th class="ps-4">Doctor</th>
+                                        <th>Date & Time</th>
+                                        <th>Status</th>
+                                        <th class="text-end pe-4">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appointment in appointments %}
+                                    <tr>
+                                        <td class="ps-4">
+                                            <p class="fw-bold text-dark mb-0">Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}</p>
+                                            <small style="color: #00a8e8;">{{ appointment.doctor.specialization.name }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="d-block fw-bold text-dark">{{ appointment.date|date:"M d, Y" }}</span>
+                                            <small class="text-muted">{{ appointment.time|time:"h:i A" }}</small>
+                                        </td>
+                                        
+                                        <td>
+                                            {% if appointment.status == 'Pending' %}
+                                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2"><i class="fas fa-clock me-1"></i> Pending</span>
+                                            {% elif appointment.status == 'Confirmed' %}
+                                                <span class="badge text-white rounded-pill px-3 py-2" style="background-color: #00a8e8;"><i class="fas fa-check-circle me-1"></i> Confirmed</span>
+                                            {% elif appointment.status == 'Completed' %}
+                                                <span class="badge bg-success text-white rounded-pill px-3 py-2"><i class="fas fa-check-double me-1"></i> Completed</span>
+                                            {% elif appointment.status == 'Cancelled' %}
+                                                <span class="badge bg-danger text-white rounded-pill px-3 py-2"><i class="fas fa-times-circle me-1"></i> Cancelled</span>
+                                            {% endif %}
+                                        </td>
+                                        
+                                        <td class="text-end pe-4">
+                                            {% if appointment.status == 'Completed' %}
+                                                {% if appointment.prescription %}
+                                                    <div class="btn-group shadow-sm">
+                                                        <a href="{% url 'view_prescription' appointment.prescription.public_id %}" class="btn btn-sm btn-outline-primary" style="border-color: #00a8e8; color: #00a8e8;" title="View">
+                                                            <i class="fas fa-eye"></i> View
+                                                        </a>
+                                                        <a href="{% url 'download_prescription' appointment.prescription.public_id %}" class="btn btn-sm text-white" style="background-color: #00a8e8;" title="Download PDF">
+                                                            <i class="fas fa-download"></i> PDF
+                                                        </a>
+                                                    </div>
+                                                {% else %}
+                                                    <span class="text-muted small">Processing...</span>
+                                                {% endif %}
+                                            {% elif appointment.status == 'Confirmed' %}
+                                                <span class="badge bg-light text-dark border">
+                                                    Token: #{{ appointment.token_number|default:"-" }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">--</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center p-5">
+                            <img src="https://cdn-icons-png.flaticon.com/512/7484/7484263.png" alt="No Appointments" style="width: 100px; opacity: 0.5;" class="mb-3">
+                            <h5 class="text-muted">No appointments found.</h5>
+                            <p class="text-muted small mb-4">You haven't booked any doctor consultations yet.</p>
+                            <a href="{% url 'home' %}#find-doctor" class="btn text-white rounded-pill px-4 py-2 shadow-sm" style="background-color: #00a8e8;">
+                                <i class="fas fa-search me-2"></i>Find a Doctor
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

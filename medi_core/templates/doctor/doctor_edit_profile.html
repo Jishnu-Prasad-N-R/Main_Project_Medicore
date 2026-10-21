@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block main %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-primary text-white p-4">
+                    <h4 class="mb-0 fw-bold"><i class="fas fa-user-edit me-2"></i> Edit Profile</h4>
+                </div>
+                <div class="card-body p-5">
+                    
+                    <div class="alert alert-light border mb-4">
+                        <h6 class="text-muted text-uppercase small fw-bold mb-3"><i class="fas fa-lock me-1"></i> Identity Details (Locked)</h6>
+                        
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="small text-muted">Doctor Name</label>
+                                <p class="fw-bold text-dark">Dr. {{ user.first_name }} {{ user.last_name }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small text-muted">Qualifications</label>
+                                <p class="fw-bold text-dark">{{ user.doctor_profile.qualifications }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small text-muted">Specialization</label>
+                                <p class="fw-bold text-dark">{{ user.doctor_profile.specialization }}</p>
+                            </div>
+                            <div class="col-12">
+                                <label class="small text-muted">Medical Registration No.</label>
+                                <p class="fw-bold text-dark">{{ user.doctor_profile.registration_number }}</p>
+                            </div>
+                        </div>
+                        <small class="text-danger mt-2 d-block"><i class="fas fa-info-circle"></i> To change these details, please contact the Admin.</small>
+                    </div>
+
+                    <hr>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <h6 class="text-primary text-uppercase small fw-bold mb-3 mt-4">Contact Details (Editable)</h6>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Phone Number</label>
+                            {{ form.phone_number }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Clinic Address</label>
+                            {{ form.address }}
+                            <div class="form-text text-muted">{{ form.address.help_text }}</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Profile Picture</label>
+                            {{ form.profile_pic }}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary py-3 fw-bold">Save Changes</button>
+                            <a href="{% url 'doctor_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

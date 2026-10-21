@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block main %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-sm rounded">
+                <div class="card-header bg-primary text-white p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0 text-white"><i class="fas fa-file-medical-alt me-2"></i> Medical Report</h4>
+                        <span class="badge bg-light text-primary fs-6">{{ prescription.appointment.date }}</span>
+                    </div>
+                </div>
+
+                <div class="card-body p-5">
+                <div class="row mb-5">
+                <div class="col-md-6">
+                    <h6 class="text-uppercase text-muted small mb-1">Doctor</h6>
+                    <h5 class="fw-bold mb-1">Dr. {{ prescription.appointment.doctor.user.first_name }} {{ prescription.appointment.doctor.user.last_name }}</h5>
+                    
+                    <p class="text-muted mb-0">{{ prescription.appointment.doctor.specialization }}</p>
+                    <p class="text-muted small mb-0">Reg No: {{ prescription.appointment.doctor.registration_number }}</p>
+                    <p class="text-muted mb-0">{{ prescription.appointment.doctor.address }}</p>
+                </div>
+
+                <div class="col-md-6 text-md-end">
+                    <h6 class="text-uppercase text-muted small mb-1">Patient</h6>
+                    <h5 class="fw-bold mb-1">{{ prescription.appointment.patient.user.first_name }} {{ prescription.appointment.patient.user.last_name }}</h5>
+                    
+                    <p class="text-muted mb-0">Age: {{ prescription.appointment.patient.age }} | Gender: {{ prescription.appointment.patient.gender }}</p>
+                    <p class="text-muted mb-0">Ph: {{ prescription.appointment.patient.phone_number }}</p>
+                    <p class="text-muted small mb-0">{{ prescription.appointment.patient.address }}</p>
+                </div>
+            </div>
+
+                    <hr>
+
+                    <div class="mb-5 mt-4">
+                        <h5 class="text-primary fw-bold mb-3">Diagnosis / Symptoms</h5>
+                        <p class="lead">{{ prescription.symptoms }}</p>
+                    </div>
+
+                    <div class="mb-5">
+                        <h5 class="text-primary fw-bold mb-3">Vitals & Lab Data</h5>
+                        <div class="row g-3">
+                            <div class="col-6 col-md-3">
+                                <div class="p-3 bg-light rounded text-center">
+                                    <small class="text-muted d-block">Blood Pressure</small>
+                                    <span class="fw-bold">{{ prescription.blood_pressure|default:"--" }}</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="p-3 bg-light rounded text-center">
+                                    <small class="text-muted d-block">Sugar Level</small>
+                                    <span class="fw-bold">{{ prescription.sugar_level|default:"--" }}</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="p-3 bg-light rounded text-center">
+                                    <small class="text-muted d-block">Cholesterol</small>
+                                    <span class="fw-bold">{{ prescription.cholesterol|default:"--" }}</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="p-3 bg-light rounded text-center">
+                                    <small class="text-muted d-block">Weight</small>
+                                    <span class="fw-bold">{{ prescription.weight|default:"--" }} Kg</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <h5 class="text-primary fw-bold mb-3">Rx (Medications)</h5>
+                        <div class="bg-light p-4 rounded border-start border-4 border-primary">
+                            {{ prescription.medicine_details|linebreaks }}
+                        </div>
+                    </div>
+
+                    {% if prescription.notes %}
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Additional Notes:</h6>
+                        <p class="text-muted fst-italic">{{ prescription.notes }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-footer bg-light p-4 text-end">
+                    <a href="{% url 'patient_dashboard' %}" class="btn btn-secondary me-2">Back</a>
+                    <a href="{% url 'download_prescription' prescription.public_id %}" class="btn btn-primary" target="_blank">
+                        <i class="fa fa-download me-2"></i> Download PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

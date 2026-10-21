@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>MediCore - Smart Healthcare</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    
+    <link href="/static/img/favicon.ico" rel="icon">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"> 
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link href="/static/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="/static/lib/animate/animate.min.css" rel="stylesheet">
+    <link href="/static/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+    <link href="/static/lib/twentytwenty/twentytwenty.css" rel="stylesheet" />
+
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary m-1" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <div class="spinner-grow text-dark m-1" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <div class="spinner-grow text-secondary m-1" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <div class="container-fluid bg-light ps-5 pe-0 d-none d-lg-block">
+        <div class="row gx-0">
+            <div class="col-md-6 text-center text-lg-start mb-2 mb-lg-0">
+                <div class="d-inline-flex align-items-center">
+                    <small class="py-2"><i class="far fa-clock text-primary me-2"></i>Opening Hours: Mon - Sat : 9.00 am - 9.00 pm</small>
+                </div>
+            </div>
+            <div class="col-md-6 text-center text-lg-end">
+                <div class="position-relative d-inline-flex align-items-center bg-primary text-white top-shape px-5">
+                    <div class="me-3 pe-3 border-end py-2">
+                        <p class="m-0"><i class="fa fa-envelope-open me-2"></i>info@medicore.com</p>
+                    </div>
+                    <div class="py-2">
+                        <p class="m-0"><i class="fa fa-phone-alt me-2"></i>+91 123 456 7890</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3 px-5">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-primary fs-3" href="{% url 'home' %}">
+                <i class="fas fa-plus-square me-2"></i>MediCore
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item me-3"><a class="nav-link fw-bold" href="{% url 'home' %}">Home</a></li>
+                    {% if not user.is_authenticated or user.is_patient %}
+                    <li class="nav-item me-4"><a class="nav-link fw-bold" href="{% url 'home' %}#doctors-list">Find Doctor</a></li>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                        
+                        <li class="nav-item dropdown me-3 d-flex align-items-center">
+                            <a class="nav-link text-primary fs-5 py-3" href="#" id="navbarSearch" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                <i class="fas fa-search"></i>
+                            </a>
+                            
+                            <div class="dropdown-menu border-0 shadow-lg rounded-3 p-3 m-0" aria-labelledby="navbarSearch" style="min-width: 320px; position: absolute; right: -10px; left: auto; top: 100%;">
+                                <form action="{% url 'home' %}#doctors-list" method="GET" class="m-0">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control shadow-none" placeholder="Search doctor, spec..." name="q" value="{{ request.GET.q|default:'' }}" style="border: 1px solid #00a8e8;" required>
+                                        <button class="btn text-white px-3 fw-bold" type="submit" style="background-color: #00a8e8;">
+                                            <i class="fas fa-search me-1"></i> Search
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle btn btn-light rounded-pill px-3 py-2 d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="background-color: #f0f8ff;">
+                                <i class="fas fa-user-circle me-2 text-primary fs-5"></i>
+                                <span class="fw-bold text-dark me-1">
+                                    {% if user.is_superuser %}
+                                        Hi, Admin
+                                    {% elif user.is_doctor %}
+                                        Hi, Dr. {{ user.first_name }}
+                                    {% else %}
+                                        Hi, {{ user.first_name }}
+                                    {% endif %}
+                                </span>
+                            </a>
+                            
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow rounded-4 m-0" aria-labelledby="userDropdown">
+                                {% if user.is_superuser %}
+                                    <li><a class="dropdown-item py-2" href="{% url 'custom_admin_dashboard' %}"><i class="fas fa-user-shield me-2 text-primary"></i> Admin Panel</a></li>
+                                {% elif user.is_doctor %}
+                                    <li><a class="dropdown-item py-2" href="{% url 'doctor_dashboard' %}"><i class="fas fa-stethoscope me-2 text-primary"></i> My Dashboard</a></li>
+                                    <li><a class="dropdown-item py-2" href="{% url 'edit_doctor_profile' %}"><i class="fas fa-user-edit me-2 text-primary"></i> Edit Profile</a></li>
+                                {% elif user.is_patient %}
+                                    <li><a class="dropdown-item py-2" href="{% url 'patient_dashboard' %}"><i class="fas fa-calendar-alt me-2 text-primary"></i> My Appointments</a></li>
+                                {% endif %}
+                                
+                                <li><hr class="dropdown-divider"></li>
+                                
+                                <li>
+                                    <form action="{% url 'logout' %}" method="post" class="px-3 py-2 m-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger w-100 rounded-pill">
+                                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+
+                    {% else %}
+                        
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle btn btn-primary text-white rounded-pill px-4 py-2 d-flex align-items-center" href="#" id="authDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-2"></i> Account
+                            </a>
+                            
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow rounded-4 m-0" aria-labelledby="authDropdown">
+                                <li><a class="dropdown-item py-2 fw-bold text-dark" href="{% url 'login' %}"><i class="fas fa-sign-in-alt me-2 text-primary"></i> Login</a></li>
+                                
+                                <li><hr class="dropdown-divider"></li>
+                                
+                                <li><span class="dropdown-item-text text-muted small fw-bold text-uppercase">New User?</span></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'signup_patient' %}"><i class="fas fa-user-injured me-2 text-primary"></i> Sign Up as Patient</a></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'signup_doctor' %}"><i class="fas fa-user-md me-2 text-success"></i> Join as Doctor</a></li>
+                            </ul>
+                        </li>
+
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% block main %}
+    {% endblock %}
+    <div class="container-fluid bg-dark text-light py-5 wow fadeInUp" data-wow-delay="0.3s" style="margin-top: 50px;">
+        <div class="container pt-5">
+            <div class="row g-5 pt-4">
+                <div class="col-lg-3 col-md-6">
+                    <h3 class="text-white mb-4">MediCore</h3>
+                    <p>The smart way to manage your health. Book appointments and get digital prescriptions instantly.</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h3 class="text-white mb-4">Quick Links</h3>
+                    <div class="d-flex flex-column justify-content-start">
+                        <a class="text-light mb-2" href="{% url 'home' %}"><i class="bi bi-arrow-right text-primary me-2"></i>Home</a>
+                        <a class="text-light mb-2" href="{% url 'home' %}#doctors-list"><i class="bi bi-arrow-right text-primary me-2"></i>Find Doctor</a>
+                        {% if user.is_authenticated and user.is_patient %}
+                            <a class="text-light mb-2" href="{% url 'patient_dashboard' %}"><i class="bi bi-arrow-right text-primary me-2"></i>My Dashboard</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h3 class="text-white mb-4">Get In Touch</h3>
+                    <p class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i>Kochi, Kerala, India</p>
+                    <p class="mb-2"><i class="bi bi-envelope-open text-primary me-2"></i>info@medicore.com</p>
+                    <p class="mb-0"><i class="bi bi-telephone text-primary me-2"></i>+91 123 456 7890</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h3 class="text-white mb-4">Follow Us</h3>
+                    <div class="d-flex">
+                        <a class="btn btn-lg btn-primary btn-lg-square rounded me-2" href="#"><i class="fab fa-twitter fw-normal"></i></a>
+                        <a class="btn btn-lg btn-primary btn-lg-square rounded me-2" href="#"><i class="fab fa-facebook-f fw-normal"></i></a>
+                        <a class="btn btn-lg btn-primary btn-lg-square rounded" href="#"><i class="fab fa-instagram fw-normal"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid text-light py-4" style="background: #051225;">
+        <div class="container">
+            <div class="row g-0">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-md-0">&copy; <a class="text-white border-bottom" href="#">MediCore</a>. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square rounded back-to-top"><i class="bi bi-arrow-up"></i></a>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/lib/wow/wow.min.js"></script>
+    <script src="/static/lib/easing/easing.min.js"></script>
+    <script src="/static/lib/waypoints/waypoints.min.js"></script>
+    <script src="/static/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="/static/lib/tempusdominus/js/moment.min.js"></script>
+    <script src="/static/lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="/static/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="/static/lib/twentytwenty/jquery.event.move.js"></script>
+    <script src="/static/lib/twentytwenty/jquery.twentytwenty.js"></script>
+
+    <script src="/static/js/main.js"></script>
+</body>
+
+</html>

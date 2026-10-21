@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% block main %}
+
+<div class="container-fluid py-5">
+    <div class="row">
+        
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm rounded mb-4">
+                <div class="card-body text-center p-4">
+                    
+                    {% if user.doctor_profile.profile_pic %}
+                        <img src="{{ user.doctor_profile.profile_pic.url }}" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #007bff;">
+                    {% else %}
+                        <img src="https://via.placeholder.com/120" class="rounded-circle mb-3 border">
+                    {% endif %}
+
+                    <h4 class="fw-bold text-dark">Dr. {{ user.first_name }} {{ user.last_name }}</h4>
+                    <p class="text-primary fw-bold mb-1">{{ user.doctor_profile.qualifications }}</p>
+                    <p class="text-primary fw-bold mb-1">{{ user.doctor_profile.specialization }}</p>
+                    
+
+                    <div class="badge bg-light text-dark border mb-3">
+                        Reg No: {{ user.doctor_profile.registration_number }}
+                    </div>
+
+                    <div class="text-start border-top pt-3 mt-2">
+                        <p class="mb-1 small text-muted">
+                            <i class="fas fa-phone-alt me-2 text-primary"></i> {{ user.doctor_profile.phone_number }}
+                        </p>
+                        <p class="mb-0 small text-muted">
+                            <i class="fas fa-map-marker-alt me-2 text-primary"></i> {{ user.doctor_profile.address|truncatechars:25 }}
+                        </p>
+                    </div>
+
+                    <a href="{% url 'edit_doctor_profile' %}" class="btn btn-outline-primary w-100 mt-3 rounded-pill">
+                        <i class="fas fa-pen small me-1"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            
+            {% if pending_appointments %}
+            <div class="card border-0 shadow-sm rounded mb-4 border-start border-warning border-5">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 text-warning fw-bold"><i class="fas fa-clock me-2"></i> Pending Approvals</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Patient</th>
+                                    <th>Reason</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appt in pending_appointments %}
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold">{{ appt.date }}</span>
+                                        <br>
+                                        <small class="text-muted">{{ appt.time }}</small>
+                                    </td>
+                                    <td>{{ appt.patient.user.first_name }} {{ appt.patient.user.last_name }}</td>
+                                    <td>{{ appt.reason|truncatechars:30 }}</td>
+                                    <td>
+                                        <form method="POST" action="{% url 'update_status' appt.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="accept">
+                                            <button type="submit" class="btn btn-sm btn-success me-1"><i class="fa fa-check"></i> Accept</button>
+                                        </form>
+                                        <form method="POST" action="{% url 'update_status' appt.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Reject appointment?');"><i class="fa fa-times"></i> Reject</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card border-0 shadow-sm rounded mb-4 border-start border-success border-5">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-success fw-bold"><i class="fas fa-stethoscope me-2"></i> Today's Schedule</h5>
+                    <span class="badge bg-success">{% now "M d, Y" %}</span>
+                </div>
+                <div class="card-body p-0">
+                    {% if today_appointments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Token</th>
+                                    <th>Time</th>
+                                    <th>Patient Name</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appt in today_appointments %}
+                                <tr>
+                                    <td><span class="badge bg-primary rounded-circle p-2">{{ appt.token_number }}</span></td>
+                                    <td>{{ appt.time }}</td>
+                                    <td>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span class="fw-bold">{{ appt.patient.user.first_name }} {{ appt.patient.user.last_name }}</span>
+                                                <br>
+                                                <small class="text-muted">Ph: {{ appt.patient.phone_number }}</small>
+                                            </div>
+                                            <a href="{% url 'patient_history' appt.patient.id %}" class="badge bg-info text-dark text-decoration-none ms-3" target="_blank">
+                                                <i class="fas fa-history"></i> History
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'add_prescription' appt.id %}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-file-prescription me-1"></i> Prescribe
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                        <div class="p-5 text-center text-muted">
+                            <i class="fas fa-calendar-check fa-3x mb-3 text-secondary"></i>
+                            <p>No appointments scheduled for today.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 text-primary fw-bold"><i class="fas fa-calendar-alt me-2"></i> Upcoming Appointments</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if future_appointments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Patient</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appt in future_appointments %}
+                                <tr>
+                                    <td class="fw-bold">{{ appt.date }}</td>
+                                    <td>{{ appt.time }}</td>
+                                    <td>{{ appt.patient.user.first_name }} {{ appt.patient.user.last_name }}</td>
+                                    <td>{{ appt.reason|truncatechars:40 }}</td>
+                                    <td><span class="badge bg-info text-dark">Scheduled</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                        <div class="p-4 text-center text-muted small">
+                            No upcoming appointments found.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

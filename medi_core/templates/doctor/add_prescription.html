@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block main %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            
+            {% if appointment.patient.known_allergies %}
+            <div class="alert alert-danger shadow-sm mb-4 border-start border-danger border-5">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                    <div>
+                        <h5 class="alert-heading fw-bold mb-1">Safety Alert: Known Allergies</h5>
+                        <p class="mb-0">Please be careful. This patient is allergic to: <strong>{{ appointment.patient.known_allergies }}</strong></p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card border-0 shadow rounded-3">
+                
+                <div class="card-header bg-primary text-white p-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="fw-bold mb-0 text-white"><i class="fas fa-file-medical-alt me-2"></i> Clinical Report</h3>
+                        <small class="opacity-75">Date: {{ appointment.date }} | Token: #{{ appointment.token_number }}</small>
+                    </div>
+                    <div class="text-end">
+                        <h5 class="mb-0 text-white">{{ appointment.patient.user.first_name }} {{ appointment.patient.user.last_name }}</h5>
+                        <small class="opacity-75">{{ appointment.patient.gender }} | Age: {{ appointment.patient.age }}</small>
+                    </div>
+                </div>
+
+                <div class="card-body p-5">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <h5 class="text-primary fw-bold mb-3"><i class="fas fa-stethoscope me-2"></i> Diagnosis & Symptoms</h5>
+                        <div class="mb-4">
+                            {{ form.symptoms }}
+                            <div class="form-text text-muted">Briefly describe the patient's condition and symptoms.</div>
+                        </div>
+                        
+                        <hr class="my-4 text-muted">
+
+                        <h5 class="text-primary fw-bold mb-3"><i class="fas fa-heartbeat me-2"></i> Vitals & Lab Data</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted fw-bold">BP (mmHg)</label>
+                                {{ form.blood_pressure }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted fw-bold">Sugar (mg/dL)</label>
+                                {{ form.sugar_level }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted fw-bold">Cholesterol (mg/dL)</label>
+                                {{ form.cholesterol }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted fw-bold">Weight (Kg)</label>
+                                {{ form.weight }}
+                            </div>
+                        </div>
+
+                        <hr class="my-4 text-muted">
+
+                        <h5 class="text-primary fw-bold mb-3"><i class="fas fa-pills me-2"></i> Prescription (Rx)</h5>
+                        <div class="mb-4">
+                            {{ form.medicine_details }}
+                            <div class="form-text text-muted">Format: Medicine Name - Dosage - Frequency (e.g., Paracetamol 500mg - 1-0-1 after food)</div>
+                        </div>
+
+                        <h5 class="text-primary fw-bold mb-3"><i class="fas fa-sticky-note me-2"></i> Advice / Diet</h5>
+                        <div class="mb-4">
+                            {{ form.notes }}
+                        </div>
+
+                        <div class="d-grid mt-5">
+                            <button type="submit" class="btn btn-success btn-lg py-3 fw-bold shadow-sm">
+                                <i class="fas fa-check-circle me-2"></i> Submit & Finish Consultation
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
